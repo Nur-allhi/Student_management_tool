@@ -1,48 +1,18 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
-#define MAX 100
-
-struct Student {
-    int id;
-    char name[50];
-    float marks;
-};
+#include "student.h"
 
 struct Student students[MAX];
 int count = 0;
 
-
-int getSafeInt(int allowBack);
-void searchStudent();
-void addStudent();
-void capitalizeName(char *name);
-void sortStudents();
-void viewStudents();
-void saveToFile();
-void loadFromFile();
-void deleteStudent();
-void editStudent();
-
 int main() {
-    int choice;
-
     loadFromFile();
-
+    int choice;
     while (1) {
         printf("\n--- Student Management System ---\n");
-        
-        printf("1. Add Student\n");
-        printf("2. View Students\n");
-        printf("3. Save to File\n");
-        printf("4. Load from File\n");
-        printf("5. Search Student by ID\n");
-        printf("6. Edit Student\n");
-        printf("7. Delete Student\n");  
-        printf("8. Sort Students\n");
-        printf("9. Exit\n");
-        printf("Enter choice: ");
+        printf("1. Add Student\n2. View Students\n3. Save\n4. Load\n");
+        printf("5. Search\n6. Edit\n7. Delete\n8. Sort\n9. Exit\nEnter choice: ");
         choice = getSafeInt(0);
 
         switch (choice) {
@@ -58,90 +28,8 @@ int main() {
             default: printf("Invalid choice!\n");
         }
     }
-
     return 0;
 }
-
-int getSafeInt(int allowBack) {
-    char buffer[20];
-    while (1) {
-        if (fgets(buffer, sizeof(buffer), stdin)) {
-            buffer[strcspn(buffer, "\n")] = 0;
-
-            if (strlen(buffer) == 0) continue;
-
-            // Check if user wants to go back
-            if (allowBack && (strcmp(buffer, "0") == 0)) {
-                return -1; // We use -1 as a special 'Back' signal
-            }
-
-            // Standard digit validation
-            int isValid = 1;
-            for (int i = 0; i < strlen(buffer); i++) {
-                if (buffer[i] < '0' || buffer[i] > '9') {
-                    isValid = 0;
-                    break;
-                }
-            }
-
-            if (isValid) return atoi(buffer);
-            printf("Invalid input! (Enter '0' to cancel): ");
-        }
-    }
-}
-
-int isValidName(char *name) {
-    if (strlen(name) == 0) return 0; 
-
-    for (int i = 0; i < strlen(name); i++) {
-        
-        if (!((name[i] >= 'a' && name[i] <= 'z') || 
-              (name[i] >= 'A' && name[i] <= 'Z') || 
-               name[i] == ' ')) {
-            return 0; 
-        }
-    }
-    return 1;
-}
-
-float getSafeFloat() {
-    char buffer[20];
-    float value;
-    int isValid = 0;
-
-    while (!isValid) {
-        if (fgets(buffer, sizeof(buffer), stdin)) {
-            buffer[strcspn(buffer, "\n")] = 0;
-
-            if (strlen(buffer) == 0) {
-                printf("Input cannot be empty. Try again: ");
-                continue;
-            }
-
-            int dotCount = 0;
-            isValid = 1;
-            for (int i = 0; i < strlen(buffer); i++) {
-                if (buffer[i] == '.') {
-                    dotCount++;
-                } else if (buffer[i] < '0' || buffer[i] > '9') {
-                    isValid = 0;
-                    break;
-                }
-            }
-
-           
-            if (isValid && dotCount <= 1) {
-                value = atof(buffer); 
-                return value;
-            } else {
-                printf("Invalid marks! Please enter a valid number (e.g., 85.5): ");
-                isValid = 0; 
-            }
-        }
-    }
-    return 0.0f;
-}
-
 
 void addStudent() {
 
@@ -197,55 +85,6 @@ void addStudent() {
     saveToFile(); 
 }
 
-void capitalizeName(char *name) {
-    int i = 0;
-
-   
-    if (name[0] >= 'a' && name[0] <= 'z') {
-        name[0] = name[0] - 32;
-    }
-
-    
-    while (name[i] != '\0') {
-        if (name[i] == ' ' && name[i + 1] >= 'a' && name[i + 1] <= 'z') {
-            name[i + 1] = name[i + 1] - 32;
-        }
-        i++;
-    }
-}
-
-void sortStudents() {
-    if (count < 2) {
-        printf("Not enough students to sort.\n");
-        return;
-    }
-
-    printf("\nSort by:\n1. ID (Ascending)\n2. Marks (Descending)\nEnter choice: ");
-    int sortChoice = getSafeInt(1);
-
-    for (int i = 0; i < count - 1; i++) {
-        for (int j = 0; j < count - i - 1; j++) {
-            int swapNeeded = 0;
-
-            if (sortChoice == 1) {
-                if (students[j].id > students[j + 1].id) swapNeeded = 1;
-            } else if (sortChoice == 2) {
-                if (students[j].marks < students[j + 1].marks) swapNeeded = 1;
-            }
-
-            if (swapNeeded) {
-                // Swapping the entire struct
-                struct Student temp = students[j];
-                students[j] = students[j + 1];
-                students[j + 1] = temp;
-            }
-        }
-    }
-
-    printf("Students sorted successfully! (View list to see changes)\n");
-    // We don't auto-save here unless you want the file permanently reordered
-}
-
 void viewStudents() {
     if (count == 0) {
         printf("No students found.\n");
@@ -266,48 +105,6 @@ void viewStudents() {
     printf("Total Students: %d\n", count);
 }
 
-void saveToFile() {
-    FILE *fp = fopen("students.txt", "w");
-
-    if (fp == NULL) {
-        printf("Error opening file!\n");
-        return;
-    }
-
-    for (int i = 0; i < count; i++) {
-        fprintf(fp, "%d|%s|%.2f\n",
-        students[i].id,
-        students[i].name,
-        students[i].marks);
-    }
-
-    fclose(fp);
-    printf("Data saved to file successfully!\n");
-}
-
-void loadFromFile() {
-    FILE *fp = fopen("students.txt", "r");
-
-    if (fp == NULL) {
-        printf("File not found!\n");
-        return;
-    }
-
-    char line[100];
-    count = 0;
-
-    while (fgets(line, sizeof(line), fp) && count < MAX) {
-        sscanf(line, "%d|%49[^|]|%f",
-               &students[count].id,
-               students[count].name,
-               &students[count].marks);
-
-        count++;
-    }
-
-    fclose(fp);
-    printf("Data loaded from file successfully!\n");
-}
 
 void searchStudent() {
     if (count == 0) {
@@ -438,4 +235,80 @@ void deleteStudent() {
     } else {
         printf("Student ID %d not found.\n", id);
     }
+}
+
+void sortStudents() {
+    if (count < 2) {
+        printf("Not enough students to sort.\n");
+        return;
+    }
+
+    printf("\nSort by:\n1. ID (Ascending)\n2. Marks (Descending)\nEnter choice: ");
+    int sortChoice = getSafeInt(1);
+
+    for (int i = 0; i < count - 1; i++) {
+        for (int j = 0; j < count - i - 1; j++) {
+            int swapNeeded = 0;
+
+            if (sortChoice == 1) {
+                if (students[j].id > students[j + 1].id) swapNeeded = 1;
+            } else if (sortChoice == 2) {
+                if (students[j].marks < students[j + 1].marks) swapNeeded = 1;
+            }
+
+            if (swapNeeded) {
+                // Swapping the entire struct
+                struct Student temp = students[j];
+                students[j] = students[j + 1];
+                students[j + 1] = temp;
+            }
+        }
+    }
+
+    printf("Students sorted successfully! (View list to see changes)\n");
+    // We don't auto-save here unless you want the file permanently reordered
+}
+
+void saveToFile() {
+    FILE *fp = fopen("students.txt", "w");
+
+    if (fp == NULL) {
+        printf("Error opening file!\n");
+        return;
+    }
+
+    for (int i = 0; i < count; i++) {
+        fprintf(fp, "%d|%s|%.2f\n",
+        students[i].id,
+        students[i].name,
+        students[i].marks);
+    }
+
+    fclose(fp);
+    printf("Data saved to file successfully!\n");
+}
+
+
+void loadFromFile() {
+    FILE *fp = fopen("students.txt", "r");
+
+    if (fp == NULL) {
+        printf("File not found!\n");
+        return;
+    }
+
+    char line[100];
+    count = 0;
+
+    while (fgets(line, sizeof(line), fp) && count < MAX) {
+        sscanf(line, "%d|%49[^|]|%f",
+               &students[count].id,
+               students[count].name,
+               &students[count].marks);
+
+        count++;
+    }
+
+    fclose(fp);
+    printf("Data loaded from file successfully!\n");
 }
