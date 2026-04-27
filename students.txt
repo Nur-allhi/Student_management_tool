@@ -1,3 +1,29 @@
-1 Namira Nur 89.000000
-2 Efty Nur 68.000000
-3 Pial Rahman 38.000000
+101|Arif Hossain|85.50
+102|Nusrat Jahan|92.00
+103|Sajid Ahmed|74.25
+104|Farhana Islam|88.00
+105|Tanvir Rahman|65.50
+106|Mehedi Hasan|79.00
+107|Riya Akter|91.50
+108|Asif Iqbal|82.00
+109|Sumaiya Khan|70.00
+110|Rakib Uddin|84.75
+111|Maliha Tabassum|95.00
+112|Imtiaz Ahmed|61.00
+113|Sadia Afrin|89.50
+114|Tamim Iqbal|77.00
+115|Ishrat Zahin|93.25
+116|Faysal Mahmud|68.50
+117|Nabila Haque|80.00
+118|Zubair Bin Bakhtiar|72.50
+119|Lina Chowdhury|87.00
+120|Kamrul Hasan|76.50
+121|Tashfia Anjum|90.00
+123|Ayesha Siddiqua|79.50
+124|Zahidul Islam|64.00
+125|Tasnim Sultana|86.25
+126|Omar Faruq|71.00
+127|Jannatul Ferdous|94.00
+128|Sabbir Hossain|81.50
+129|Rifat Ara|75.00
+130|Nayem Khan|69.75
