@@ -1,45 +1,36 @@
 # Student Management System (C CLI)
 
-A simple command-line application written in C to manage student records using basic data structures and file handling.
+✅ **FEATURES COMPLETED**
+1. **Core System Architecture**
+   * Menu-driven navigation with continuous loop.
+   * Integrated auto-loading of data on program startup.
+2. **Data Model**
+   * `struct Student` containing ID (int), Name (char array), and Marks (float).
+   * Global array storage with a fixed `MAX` capacity.
+3. **Record Management (CRUD)**
+   * **Add**: Supports full names with spaces and automatic capitalization.
+   * **View**: Formatted display of all records.
+   * **Search**: Linear search by Student ID.
+   * **Edit**: Modify name and marks for an existing ID.
+   * **Delete**: Removes records using array-shifting logic.
+4. **File Persistence (TEXT FORMAT)**
+   * **Auto-Save**: Updates `students.txt` immediately after any Add, Edit, or Delete operation.
+   * **Format**: `id|name|marks` parsing using `sscanf`.
+5. **Stability Fixes**
+   * Input buffer clearing with `getchar()`.
+   * Handling newline characters from `fgets`.
 
-## Features
+🚧 **CURRENT LIMITATIONS**
+* Fixed size array (MAX = 100).
+* No duplicate ID prevention yet.
+* Basic input validation (weak handling of non-numeric inputs).
 
-* Add student (ID, Name, Marks)
-* View all students
-* Save data to file
-* Load data from file
-* Handles names with spaces
+🧠 **CONCEPTS APPLIED**
+* **Array Shifting**: Moving elements to maintain order after deletion.
+* **Struct-based Modeling**: Real-world entity representation.
+* **File I/O**: Automated read/write operations for persistence.
+* **String Manipulation**: Custom capitalization logic and delimiter-based parsing.
 
-## Concepts Used
-
-* Structs (data modeling)
-* Arrays (storage)
-* Functions (modular design)
-* File I/O (persistence)
-* String handling
-
-## How to Run
-
-Compile:
-
-```
-gcc main.c -o app
-```
-
-Run:
-
-```
-./app
-```
-
-## Notes
-
-* Data is stored in `students.txt`
-* Maximum 100 students (fixed array)
-* Basic input handling implemented
-
-
-
----
-
-This project demonstrates fundamental C programming concepts and simple CLI-based system design.
+💻 **HOW TO RUN**
+1. **Compile**: `gcc main.c -o app`
+2. **Run**: `./app`
