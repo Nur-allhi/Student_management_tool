@@ -1,36 +1,29 @@
-# Student Management System (C CLI)
+# Student Management System (v2.0)
 
-✅ **FEATURES COMPLETED**
-1. **Core System Architecture**
-   * Menu-driven navigation with continuous loop.
-   * Integrated auto-loading of data on program startup.
-2. **Data Model**
-   * `struct Student` containing ID (int), Name (char array), and Marks (float).
-   * Global array storage with a fixed `MAX` capacity.
-3. **Record Management (CRUD)**
-   * **Add**: Supports full names with spaces and automatic capitalization.
-   * **View**: Formatted display of all records.
-   * **Search**: Linear search by Student ID.
-   * **Edit**: Modify name and marks for an existing ID.
-   * **Delete**: Removes records using array-shifting logic.
-4. **File Persistence (TEXT FORMAT)**
-   * **Auto-Save**: Updates `students.txt` immediately after any Add, Edit, or Delete operation.
-   * **Format**: `id|name|marks` parsing using `sscanf`.
-5. **Stability Fixes**
-   * Input buffer clearing with `getchar()`.
-   * Handling newline characters from `fgets`.
+A robust, crash-proof CLI application built in C for managing student records. This version focuses on **Data Integrity** and **User Experience**, featuring a comprehensive validation layer and dynamic navigation.
 
-🚧 **CURRENT LIMITATIONS**
-* Fixed size array (MAX = 100).
-* No duplicate ID prevention yet.
-* Basic input validation (weak handling of non-numeric inputs).
+## 🚀 Key Features
 
-🧠 **CONCEPTS APPLIED**
-* **Array Shifting**: Moving elements to maintain order after deletion.
-* **Struct-based Modeling**: Real-world entity representation.
-* **File I/O**: Automated read/write operations for persistence.
-* **String Manipulation**: Custom capitalization logic and delimiter-based parsing.
+- **Bulletproof Input Validation**: Custom protectors (`getSafeInt`, `getSafeFloat`) prevent infinite loops and crashes from non-numeric input.
+- **Business Logic Filters**: 
+  - Prevents duplicate Student IDs.
+  - Validates names (alphabetic characters only).
+  - Restricts marks to a logical range (0-100).
+- **Professional UI**: Tabular data display with aligned columns for easy reading.
+- **Advanced Sorting**: Organize records by **ID (Ascending)** or **Performance/Marks (Descending)** using the Bubble Sort algorithm.
+- **Safe Navigation**: "Early Exit" logic allowed in all menus—press `0` to cancel any operation and return to the main menu.
+- **Persistent Storage**: Automatic data synchronization with `students.txt`.
 
-💻 **HOW TO RUN**
-1. **Compile**: `gcc main.c -o app`
-2. **Run**: `./app`
+## 🛠️ Technical Implementation
+
+- **Language**: C
+- **Data Structure**: Array of Structs
+- **Algorithm**: Bubble Sort (swapping full struct units to maintain data integrity)
+- **File I/O**: Formatted file handling for long-term storage.
+
+## 📋 How to Run
+
+1. Clone the repository.
+2. Compile using GCC:
+   ```bash
+   gcc main.c -o student_system

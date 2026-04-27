@@ -14,10 +14,11 @@ struct Student students[MAX];
 int count = 0;
 
 
-int getSafeInt();
+int getSafeInt(int allowBack);
 void searchStudent();
 void addStudent();
 void capitalizeName(char *name);
+void sortStudents();
 void viewStudents();
 void saveToFile();
 void loadFromFile();
@@ -39,9 +40,10 @@ int main() {
         printf("5. Search Student by ID\n");
         printf("6. Edit Student\n");
         printf("7. Delete Student\n");  
-        printf("8. Exit\n");
+        printf("8. Sort Students\n");
+        printf("9. Exit\n");
         printf("Enter choice: ");
-        choice = getSafeInt();
+        choice = getSafeInt(0);
 
         switch (choice) {
             case 1: addStudent(); break;
@@ -51,7 +53,8 @@ int main() {
             case 5: searchStudent(); break;
             case 6: editStudent(); break;
             case 7: deleteStudent(); break;
-            case 8: exit(0);
+            case 8: sortStudents(); break;
+            case 9: exit(0);
             default: printf("Invalid choice!\n");
         }
     }
@@ -59,24 +62,21 @@ int main() {
     return 0;
 }
 
-int getSafeInt() {
+int getSafeInt(int allowBack) {
     char buffer[20];
-    int value;
-    int isValid = 0;
-
-    while (!isValid) {
+    while (1) {
         if (fgets(buffer, sizeof(buffer), stdin)) {
-           
             buffer[strcspn(buffer, "\n")] = 0;
 
-           
-            if (strlen(buffer) == 0) {
-                printf("Input cannot be empty. Try again: ");
-                continue;
+            if (strlen(buffer) == 0) continue;
+
+            // Check if user wants to go back
+            if (allowBack && (strcmp(buffer, "0") == 0)) {
+                return -1; // We use -1 as a special 'Back' signal
             }
 
-            
-            isValid = 1;
+            // Standard digit validation
+            int isValid = 1;
             for (int i = 0; i < strlen(buffer); i++) {
                 if (buffer[i] < '0' || buffer[i] > '9') {
                     isValid = 0;
@@ -84,26 +84,21 @@ int getSafeInt() {
                 }
             }
 
-            if (isValid) {
-                value = atoi(buffer);
-                return value;
-            } else {
-                printf("Invalid input! Please enter a number: ");
-            }
+            if (isValid) return atoi(buffer);
+            printf("Invalid input! (Enter '0' to cancel): ");
         }
     }
-    return 0;
 }
 
 int isValidName(char *name) {
-    if (strlen(name) == 0) return 0; // Empty check
+    if (strlen(name) == 0) return 0; 
 
     for (int i = 0; i < strlen(name); i++) {
-        // Allow letters (A-Z, a-z) and spaces
+        
         if (!((name[i] >= 'a' && name[i] <= 'z') || 
               (name[i] >= 'A' && name[i] <= 'Z') || 
                name[i] == ' ')) {
-            return 0; // Found a number or symbol
+            return 0; 
         }
     }
     return 1;
@@ -134,13 +129,13 @@ float getSafeFloat() {
                 }
             }
 
-            // A valid float can have at most one decimal point
+           
             if (isValid && dotCount <= 1) {
-                value = atof(buffer); // Convert string to float
+                value = atof(buffer); 
                 return value;
             } else {
                 printf("Invalid marks! Please enter a valid number (e.g., 85.5): ");
-                isValid = 0; // Reset to keep looping
+                isValid = 0; 
             }
         }
     }
@@ -149,20 +144,26 @@ float getSafeFloat() {
 
 
 void addStudent() {
+
+    printf("Enter ID (or 0 to go back): ");
+    int tempId = getSafeInt(1); // 1 means we allow the 'back' option
+    
+    if (tempId == -1) {
+        printf("Returning to main menu...\n");
+        return; 
+    }
+
     if (count >= MAX) {
         printf("Student list is full!\n");
         return;
     }
 
-    // 1. ID Validation (Already implemented)
-    printf("Enter ID: ");
-    int tempId = getSafeInt();
     if (tempId <= 0) {
         printf("Invalid ID. Cancelled.\n");
         return;
     }
 
-    // 2. Name Validation (New Logic)
+    
     char tempName[50];
     int nameOk = 0;
     while (!nameOk) {
@@ -177,7 +178,7 @@ void addStudent() {
         }
     }
 
-    // 3. Marks Validation (Already implemented)
+    
     printf("Enter Marks (0-100): ");
     float tempMarks = getSafeFloat();
     if (tempMarks < 0 || tempMarks > 100) {
@@ -185,7 +186,7 @@ void addStudent() {
         return;
     }
 
-    // All checks passed -> Assign and Save
+    
     students[count].id = tempId;
     strcpy(students[count].name, tempName);
     capitalizeName(students[count].name);
@@ -213,19 +214,56 @@ void capitalizeName(char *name) {
     }
 }
 
+void sortStudents() {
+    if (count < 2) {
+        printf("Not enough students to sort.\n");
+        return;
+    }
+
+    printf("\nSort by:\n1. ID (Ascending)\n2. Marks (Descending)\nEnter choice: ");
+    int sortChoice = getSafeInt(1);
+
+    for (int i = 0; i < count - 1; i++) {
+        for (int j = 0; j < count - i - 1; j++) {
+            int swapNeeded = 0;
+
+            if (sortChoice == 1) {
+                if (students[j].id > students[j + 1].id) swapNeeded = 1;
+            } else if (sortChoice == 2) {
+                if (students[j].marks < students[j + 1].marks) swapNeeded = 1;
+            }
+
+            if (swapNeeded) {
+                // Swapping the entire struct
+                struct Student temp = students[j];
+                students[j] = students[j + 1];
+                students[j + 1] = temp;
+            }
+        }
+    }
+
+    printf("Students sorted successfully! (View list to see changes)\n");
+    // We don't auto-save here unless you want the file permanently reordered
+}
+
 void viewStudents() {
     if (count == 0) {
         printf("No students found.\n");
         return;
     }
 
-    printf("\n--- Student List ---\n");
+    printf("\n------------------------------------------------------------\n");
+    printf("%-10s | %-30s | %-10s\n", "ID", "Name", "Marks");
+    printf("------------------------------------------------------------\n");
+
     for (int i = 0; i < count; i++) {
-        printf("ID: %d | Name: %s | Marks: %.2f\n",
-               students[i].id,
-               students[i].name,
+        printf("%-10d | %-30s | %-10.2f\n", 
+               students[i].id, 
+               students[i].name, 
                students[i].marks);
     }
+    printf("------------------------------------------------------------\n");
+    printf("Total Students: %d\n", count);
 }
 
 void saveToFile() {
@@ -302,36 +340,62 @@ void searchStudent() {
 
 void editStudent() {
     if (count == 0) {
-        printf("No students available to edit.\n");
+        printf("No students to edit.\n");
         return;
     }
 
-    int id, found = 0;
-    printf("Enter Student ID to edit: ");
-    scanf("%d", &id);
+    printf("Enter Student ID to edit (or 0 to go back): ");
+    int id = getSafeInt(1); // Enable 'back' logic
 
+    if (id == -1) {
+        printf("Returning to main menu...\n");
+        return;
+    }
+
+    int index = -1;
     for (int i = 0; i < count; i++) {
         if (students[i].id == id) {
-            printf("Current Data - Name: %s, Marks: %.2f\n", students[i].name, students[i].marks);
-            
-            printf("Enter New Name: ");
-            getchar();
-            fgets(students[i].name, sizeof(students[i].name), stdin);
-            students[i].name[strcspn(students[i].name, "\n")] = 0;
-            capitalizeName(students[i].name);
-
-            printf("Enter New Marks: ");
-            scanf("%f", &students[i].marks);
-
-            printf("Student record updated successfully!\n");
-            found = 1;
+            index = i;
             break;
         }
     }
 
-    if (!found) printf("Student ID %d not found.\n", id);
-    saveToFile();
+    if (index == -1) {
+        printf("Student ID %d not found.\n", id);
+        return;
+    }
 
+    printf("\nEditing Student: %s (ID: %d)\n", students[index].name, students[index].id);
+
+    // 1. Edit Name
+    char tempName[50];
+    printf("Enter new name (or '0' to keep current: %s): ", students[index].name);
+    fgets(tempName, sizeof(tempName), stdin);
+    tempName[strcspn(tempName, "\n")] = 0;
+
+    if (strcmp(tempName, "0") != 0 && strlen(tempName) > 0) {
+        if (isValidName(tempName)) {
+            strcpy(students[index].name, tempName);
+            capitalizeName(students[index].name);
+        } else {
+            printf("Invalid name format. Name not updated.\n");
+        }
+    }
+
+    // 2. Edit Marks
+    printf("Enter new marks (or -1 to keep current: %.2f): ", students[index].marks);
+    float tempMarks = getSafeFloat();
+
+    if (tempMarks != -1) {
+        if (tempMarks >= 0 && tempMarks <= 100) {
+            students[index].marks = tempMarks;
+        } else {
+            printf("Invalid marks range. Marks not updated.\n");
+        }
+    }
+
+    printf("Record updated successfully!\n");
+    saveToFile();
 }
 
 void deleteStudent() {
@@ -340,23 +404,38 @@ void deleteStudent() {
         return;
     }
 
-    int id, found = 0;
     printf("Enter Student ID to delete: ");
-    scanf("%d", &id);
+    int id = getSafeInt(1); // 1 means we allow the 'back' option
+    int found = -1;
 
+    // Find the index
     for (int i = 0; i < count; i++) {
         if (students[i].id == id) {
-            found = 1;
-            
-            for (int j = i; j < count - 1; j++) {
-                students[j] = students[j + 1];
-            }
-            count--;
-            printf("Student deleted successfully!\n");
+            found = i;
             break;
         }
     }
 
-    if (!found) printf("Student ID %d not found.\n", id);
-    saveToFile();
+    if (found != -1) {
+        // Show what is about to be deleted
+        printf("\nFound: ID: %d | Name: %s\n", students[found].id, students[found].name);
+        printf("Are you sure you want to delete this record? (y/n): ");
+        
+        char confirm;
+        scanf(" %c", &confirm); // Note the space before %c to skip any leftover newline
+        getchar(); // Clean the buffer
+
+        if (confirm == 'y' || confirm == 'Y') {
+            for (int j = found; j < count - 1; j++) {
+                students[j] = students[j + 1];
+            }
+            count--;
+            printf("Student deleted successfully!\n");
+            saveToFile();
+        } else {
+            printf("Deletion cancelled.\n");
+        }
+    } else {
+        printf("Student ID %d not found.\n", id);
+    }
 }
