@@ -13,6 +13,8 @@ struct Student {
 struct Student students[MAX];
 int count = 0;
 
+
+int getSafeInt();
 void searchStudent();
 void addStudent();
 void capitalizeName(char *name);
@@ -39,7 +41,7 @@ int main() {
         printf("7. Delete Student\n");  
         printf("8. Exit\n");
         printf("Enter choice: ");
-        scanf("%d", &choice);
+        choice = getSafeInt();
 
         switch (choice) {
             case 1: addStudent(); break;
@@ -57,31 +59,141 @@ int main() {
     return 0;
 }
 
+int getSafeInt() {
+    char buffer[20];
+    int value;
+    int isValid = 0;
+
+    while (!isValid) {
+        if (fgets(buffer, sizeof(buffer), stdin)) {
+           
+            buffer[strcspn(buffer, "\n")] = 0;
+
+           
+            if (strlen(buffer) == 0) {
+                printf("Input cannot be empty. Try again: ");
+                continue;
+            }
+
+            
+            isValid = 1;
+            for (int i = 0; i < strlen(buffer); i++) {
+                if (buffer[i] < '0' || buffer[i] > '9') {
+                    isValid = 0;
+                    break;
+                }
+            }
+
+            if (isValid) {
+                value = atoi(buffer);
+                return value;
+            } else {
+                printf("Invalid input! Please enter a number: ");
+            }
+        }
+    }
+    return 0;
+}
+
+int isValidName(char *name) {
+    if (strlen(name) == 0) return 0; // Empty check
+
+    for (int i = 0; i < strlen(name); i++) {
+        // Allow letters (A-Z, a-z) and spaces
+        if (!((name[i] >= 'a' && name[i] <= 'z') || 
+              (name[i] >= 'A' && name[i] <= 'Z') || 
+               name[i] == ' ')) {
+            return 0; // Found a number or symbol
+        }
+    }
+    return 1;
+}
+
+float getSafeFloat() {
+    char buffer[20];
+    float value;
+    int isValid = 0;
+
+    while (!isValid) {
+        if (fgets(buffer, sizeof(buffer), stdin)) {
+            buffer[strcspn(buffer, "\n")] = 0;
+
+            if (strlen(buffer) == 0) {
+                printf("Input cannot be empty. Try again: ");
+                continue;
+            }
+
+            int dotCount = 0;
+            isValid = 1;
+            for (int i = 0; i < strlen(buffer); i++) {
+                if (buffer[i] == '.') {
+                    dotCount++;
+                } else if (buffer[i] < '0' || buffer[i] > '9') {
+                    isValid = 0;
+                    break;
+                }
+            }
+
+            // A valid float can have at most one decimal point
+            if (isValid && dotCount <= 1) {
+                value = atof(buffer); // Convert string to float
+                return value;
+            } else {
+                printf("Invalid marks! Please enter a valid number (e.g., 85.5): ");
+                isValid = 0; // Reset to keep looping
+            }
+        }
+    }
+    return 0.0f;
+}
+
+
 void addStudent() {
     if (count >= MAX) {
         printf("Student list is full!\n");
         return;
     }
 
+    // 1. ID Validation (Already implemented)
     printf("Enter ID: ");
-    scanf("%d", &students[count].id);
+    int tempId = getSafeInt();
+    if (tempId <= 0) {
+        printf("Invalid ID. Cancelled.\n");
+        return;
+    }
 
-    printf("Enter Name: ");
-    getchar(); 
-    fgets(students[count].name, sizeof(students[count].name), stdin);
+    // 2. Name Validation (New Logic)
+    char tempName[50];
+    int nameOk = 0;
+    while (!nameOk) {
+        printf("Enter Name (Alphabets only): ");
+        fgets(tempName, sizeof(tempName), stdin);
+        tempName[strcspn(tempName, "\n")] = 0;
 
-    
-    students[count].name[strcspn(students[count].name, "\n")] = 0;
+        if (isValidName(tempName)) {
+            nameOk = 1;
+        } else {
+            printf("Invalid Name! Use only letters and spaces.\n");
+        }
+    }
 
-   
+    // 3. Marks Validation (Already implemented)
+    printf("Enter Marks (0-100): ");
+    float tempMarks = getSafeFloat();
+    if (tempMarks < 0 || tempMarks > 100) {
+        printf("Invalid Marks. Cancelled.\n");
+        return;
+    }
+
+    // All checks passed -> Assign and Save
+    students[count].id = tempId;
+    strcpy(students[count].name, tempName);
     capitalizeName(students[count].name);
-
-    printf("Enter Marks: ");
-    scanf("%f", &students[count].marks);
+    students[count].marks = tempMarks;
 
     count++;
     printf("Student added successfully!\n");
-    saveToFile();
+    saveToFile(); 
 }
 
 void capitalizeName(char *name) {

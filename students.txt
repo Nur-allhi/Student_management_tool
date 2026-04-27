@@ -17,7 +17,6 @@
 117|Nabila Haque|80.00
 118|Zubair Bin Bakhtiar|72.50
 119|Lina Chowdhury|87.00
-120|Kamrul Hasan|76.50
 121|Tashfia Anjum|90.00
 123|Ayesha Siddiqua|79.50
 124|Zahidul Islam|64.00
@@ -27,3 +26,4 @@
 128|Sabbir Hossain|81.50
 129|Rifat Ara|75.00
 130|Nayem Khan|69.75
+131|Ali Kodom|66.00
